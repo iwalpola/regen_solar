@@ -1,6 +1,8 @@
 import sunspec.core.client as client
 import json
 from datetime import datetime
+import time
+import random
 
 """ Device class represents and manipulates Sunspec Devices on the network. """
 
@@ -23,8 +25,8 @@ class Device(object):
 		self.retrieve()
 		self.calcdelta()
 
-	def connect():
-		if fake:
+	def connect(self):
+		if self.fake:
 			self.online_status = 1
 		else:
 			""" Create a new inverter device """
@@ -37,10 +39,9 @@ class Device(object):
 				self.online_status = 0
 
 	def read(self):
-		if fake:
-			self.connection.inverter.read()
-			self.kW = (2400)/1000
-			self.kWh = (25089)/1000
+		if self.fake:
+			self.kW = random.randint(200, 3200)
+			self.kWh = (int(time.time()/100000)+random.randint(100, 500))
 		elif self.online_status:
 			try:
 				self.connection.inverter.read()
@@ -63,8 +64,10 @@ class Device(object):
 		#call read() to update vlues before potential persistance
 		#check if init values expired, and update
 		if self.persistance["daily_initial"]["last_set"].date<datetime.today().date:
+			print "daily initial updated for "+self.name
 			self.persist(daily=1)
 		if self.persistance["monthly_initial"]["last_set"].replace(day=1).date<datetime.now().replace(day=1).date:
+			print "monthly initial updated for "+self.name
 			self.persist(monthly=1)
 
 	def persist(self, daily = 0, monthly = 0):
