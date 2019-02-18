@@ -63,10 +63,10 @@ class Device(object):
 		self.persistance["monthly_initial"]["last_set"] = datetime.strptime(self.persistance["monthly_initial"]["last_set"],"%Y:%m:%d %H:%M:%S")
 		#call read() to update vlues before potential persistance
 		#check if init values expired, and update
-		if self.persistance["daily_initial"]["last_set"].date<datetime.today().date:
+		if self.lst_daily().date()<datetime.today().date():
 			print "daily initial updated for "+self.name
 			self.persist(daily=1)
-		if self.persistance["monthly_initial"]["last_set"].replace(day=1).date<datetime.now().replace(day=1).date:
+		if self.lst_monthly().replace(day=1).date()<datetime.now().replace(day=1).date():
 			print "monthly initial updated for "+self.name
 			self.persist(monthly=1)
 
@@ -91,3 +91,7 @@ class Device(object):
 		f.close()
 		self.persistance["daily_initial"]["last_set"] = datetime.strptime(self.persistance["daily_initial"]["last_set"],"%Y:%m:%d %H:%M:%S")
 		self.persistance["monthly_initial"]["last_set"] = datetime.strptime(self.persistance["monthly_initial"]["last_set"],"%Y:%m:%d %H:%M:%S")
+	def lst_daily(self):
+		return self.persistance["daily_initial"]["last_set"]
+	def lst_monthly(self):
+		return self.persistance["monthly_initial"]["last_set"]

@@ -75,4 +75,5 @@ while True:
 		sumMonthlyDelta = 0
 		query_devices()
 		update_display()
+	else: print "doing nothing"
 	time.sleep(update_interval - ((time.time() - starttime) % update_interval))
