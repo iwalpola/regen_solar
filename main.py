@@ -62,6 +62,7 @@ def query_devices():
 			sumMonthlyDelta += deviceCollection[device].monthly_delta
 			sumkW += deviceCollection[device].kW
 			sumkWh += deviceCollection[device].kWh
+			#print "kWh for "+ deviceCollection[device].name +" is "+ str(deviceCollection[device].kWh)
 
 def update_display():
 	# print "display curently undefined"
@@ -91,7 +92,7 @@ update_display()
 while True:
 	time_now = datetime.now().time()
 	event, values = window.Read(timeout=update_interval*1000)
-	if event == 'Exit':
+	if event is None or 'Exit':
 		break
 	elif time_now>prog_start and time_now<prog_end:
 		query_devices()
