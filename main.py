@@ -22,7 +22,7 @@ fake = 1 #Should fake? put 0 for no, 1 for yes
 update_interval = 60
 
 """set program start and end time"""
-prog_start = time(9,18,0)
+prog_start = time(6,0,0)
 prog_end = time(21,0,0)
 
 """
@@ -92,7 +92,7 @@ update_display()
 while True:
 	time_now = datetime.now().time()
 	event, values = window.Read(timeout=update_interval*1000)
-	if event is None or 'Exit':
+	if event is None or event=='Exit':
 		break
 	elif time_now>prog_start and time_now<prog_end:
 		query_devices()
