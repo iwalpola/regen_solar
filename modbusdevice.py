@@ -8,7 +8,7 @@ import random
 
 class Device(object):
 
-	def __init__(self, a=1, i='', name='device_friendly_name', fake=0):
+	def __init__(self, a=1, i='', name='device_friendly_name', fake=0, uofr = 1):
 		self.a = a
 		self.fake = fake
 		self.i = i
@@ -23,6 +23,8 @@ class Device(object):
 		self.connect()
 		self.read()
 		self.retrieve()
+		if uofr:
+			self.update_persistance()
 		self.calcdelta()
 
 	def connect(self):
@@ -40,8 +42,9 @@ class Device(object):
 
 	def read(self):
 		if self.fake:
+			epoch = int(time.time())
 			self.kW = random.randint(200, 3200)
-			self.kWh = (int(time.time()/100000)+random.randint(100, 500))
+			self.kWh = ((epoch%100000) + random.randint(1000, 5000))
 		elif self.online_status:
 			try:
 				self.connection.inverter.read()
@@ -61,8 +64,8 @@ class Device(object):
 		f.close()
 		self.persistance["daily_initial"]["last_set"] = datetime.strptime(self.persistance["daily_initial"]["last_set"],"%Y:%m:%d %H:%M:%S")
 		self.persistance["monthly_initial"]["last_set"] = datetime.strptime(self.persistance["monthly_initial"]["last_set"],"%Y:%m:%d %H:%M:%S")
-		#call read() to update vlues before potential persistance
-		#check if init values expired, and update
+
+	def update_persistance(self):
 		if self.lst_daily().date()<datetime.today().date():
 			print "daily initial updated for "+self.name
 			self.persist(daily=1)
@@ -71,8 +74,11 @@ class Device(object):
 			self.persist(monthly=1)
 
 	def persist(self, daily = 0, monthly = 0):
-		if self.kWh==0 and self.online_status:
+		if self.kWh==0:
 			print "zero kWh value not allowed to persist"
+			return
+		if not self.online_status:
+			print "not online , can't persist"
 			return
 		now = datetime.now()
 		if daily:
@@ -91,7 +97,9 @@ class Device(object):
 		f.close()
 		self.persistance["daily_initial"]["last_set"] = datetime.strptime(self.persistance["daily_initial"]["last_set"],"%Y:%m:%d %H:%M:%S")
 		self.persistance["monthly_initial"]["last_set"] = datetime.strptime(self.persistance["monthly_initial"]["last_set"],"%Y:%m:%d %H:%M:%S")
+
 	def lst_daily(self):
 		return self.persistance["daily_initial"]["last_set"]
+
 	def lst_monthly(self):
 		return self.persistance["monthly_initial"]["last_set"]
